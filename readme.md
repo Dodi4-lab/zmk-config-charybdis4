@@ -21,6 +21,7 @@ This configuration supports two modes:
     - [Dongle Mode](#dongle-mode)
     - [Dongle Display Features](#dongle-display-features)
       - [Prospector Dongle (Seeeduino XIAO BLE)](#prospector-dongle-seeeduino-xiao-ble)
+      - [YADS Prospector Dongle (Seeeduino XIAO BLE)](#yads-prospector-dongle-seeeduino-xiao-ble)
       - [Nice!Nano Dongle (Nice!Nano v2)](#nicenano-dongle-nicenano-v2)
   - [West.yml Configuration](#westyml-configuration)
     - [Remotes Section](#remotes-section)
@@ -52,13 +53,22 @@ Here is the BOM for this project: [BOM Charybdis 4x6 Wireless](/docs/bom/readme.
 ### Additional Components for Dongle Mode
 
 **Option 1: Prospector Dongle (Seeeduino XIAO BLE)**
+
 - 1x Seeeduino XIAO BLE (nRF52840) - Dongle central
 - 1x [Prospector Display Module](https://github.com/carrefinho/prospector) - Custom OLED display
 
 **Option 2: Nice!Nano Dongle (Nice!Nano v2)**
+
 - 1x Nice!Nano v2 (nRF52840) - Dongle central
 - 1x 128x32 OLED Display (SSD1306, I2C) - Generic 0.91" OLED module
 - Uses [zmk-dongle-display](https://github.com/englmaxi/zmk-dongle-display) module
+
+**Option 3: YADS Prospector Dongle (Seeeduino XIAO BLE)**
+
+- 1x Seeeduino XIAO BLE (nRF52840) - Dongle central
+- 1x [Prospector Display Module](https://github.com/carrefinho/prospector) - Custom OLED display
+- Uses [zmk-dongle-screen](https://github.com/bwshockley/zmk-dongle-screen) module (YADS)
+- Alternative firmware for Prospector hardware with different features
 
 ![Wireless Keyboard](/docs/picture/wireless-charybdis.png)
 
@@ -92,12 +102,12 @@ zmk-config-charybdis/
 │   │       │   ├── charybdis_left.overlay                # Left side device tree overlay
 │   │       │   ├── charybdis_right_standalone.conf       # Right side Kconfig (standalone mode)
 │   │       │   ├── charybdis_right_standalone.overlay    # Right side overlay (standalone mode)
-│   │       │   ├── charybdis_right_dongle.conf           # Symlink → charybdis_right_standalone.conf
-│   │       │   ├── charybdis_right_dongle.overlay        # Right side overlay (dongle mode)
-│   │       │   ├── prospector_dongle.conf                # Prospector dongle Kconfig options
-│   │       │   ├── prospector_dongle.overlay             # Prospector dongle device tree overlay
-│   │       │   ├── nice_dongle.conf                      # Nice!Nano dongle Kconfig options
-│   │       │   ├── nice_dongle.overlay                   # Nice!Nano dongle device tree overlay
+│   │       │   ├── dongle_charybdis_right.conf           # Symlink → charybdis_right_standalone.conf
+│   │       │   ├── dongle_charybdis_right.overlay        # Right side overlay (dongle mode)
+│   │       │   ├── dongle_prospector.conf                # Prospector dongle Kconfig options
+│   │       │   ├── dongle_prospector.overlay             # Prospector dongle device tree overlay
+│   │       │   ├── dongle_nice.conf                      # Nice!Nano dongle Kconfig options
+│   │       │   ├── dongle_nice.overlay                   # Nice!Nano dongle device tree overlay
 │   │       │   ├── Kconfig.defconfig                     # Shield Kconfig definitions
 │   │       │   └── Kconfig.shield                        # Shield Kconfig options
 │   │       └── tester_pro_micro/    # Pro Micro GPIO tester shield
@@ -143,7 +153,7 @@ zmk-config-charybdis/
 - **`charybdis_layers.h`**: Layer definitions (BASE, POINTER, LOWER, RAISE, SYMBOLS, SCROLL, SNIPING) used across all shields
 - **`charybdis_trackball_processors.dtsi`**: Shared trackball input processing configurations (snipe/scroll/move modes)
 - **`charybdis_right_common.dtsi`**: Common hardware config for both right keyboard variants (GPIO, SPI, trackball device)
-- **`charybdis_right_dongle.conf`**: Symlink to `charybdis_right_standalone.conf` (identical hardware config)
+- **`dongle_charybdis_right.conf`**: Symlink to `charybdis_right_standalone.conf` (identical hardware config)
 
 #### Shield-Specific Files
 
@@ -151,8 +161,8 @@ zmk-config-charybdis/
 - **`config/charybdis.dtsi`**: Shared device tree definitions (keyboard matrix, kscan, physical layout)
 - **`charybdis_left.overlay`**: Left side configuration (same for both modes)
 - **`charybdis_right_standalone.overlay`**: Right side for **standalone mode** (processes trackball locally)
-- **`charybdis_right_dongle.overlay`**: Right side for **dongle mode** (forwards trackball to dongle)
-- **`prospector_dongle.overlay`**: Prospector dongle configuration (receives trackball from right peripheral)
+- **`dongle_charybdis_right.overlay`**: Right side for **dongle mode** (forwards trackball to dongle)
+- **`dongle_prospector.overlay`**: Prospector dongle configuration (receives trackball from right peripheral)
 - **`config/west.yml`**: Defines external dependencies (see West.yml section below)
 
 ## Operating Modes
@@ -181,13 +191,25 @@ In dongle mode, a dedicated dongle acts as the central device with a display:
 ### Dongle Display Features
 
 #### Prospector Dongle (Seeeduino XIAO BLE)
+
 - Active layer indicator with layer names
 - Split battery status for both peripherals
 - Peripheral connection status indicators
 - Caps Word indicator
 - Fixed brightness (50%) without ambient light sensor
 
+#### YADS Prospector Dongle (Seeeduino XIAO BLE)
+
+- **Display**: Prospector 1.69" IPS LCD
+- **Features**: Uses YADS (Yet Another Dongle Screen) firmware
+- **Battery**: Detailed battery status for central and peripherals
+- **WPM**: Words Per Minute graph/indicator
+- **Brightness**: Adjustable brightness with keyboard control
+- **System**: Connection status, layer indication, modifiers
+- **Sleep**: Deep sleep support for power saving
+
 #### Nice!Nano Dongle (Nice!Nano v2)
+
 - **Display**: 128x32 OLED (SSD1306) via I2C
 - **Active layer name** with center alignment and scrolling support
 - **Peripheral battery levels** (left + right keyboards)
@@ -198,12 +220,11 @@ In dongle mode, a dedicated dongle acts as the central device with a display:
 - **Optimized for 32px height**: Bongo cat disabled, modifiers optional
 
 **Wiring (Nice!Nano to OLED):**
+
 - VCC → 3.3V
 - GND → GND
 - SDA → Pin 2
 - SCL → Pin 3
-
-See [manual_build/NICE_DONGLE_SETUP.md](manual_build/NICE_DONGLE_SETUP.md) for detailed setup instructions.
 
 ## West.yml Configuration
 
@@ -388,7 +409,7 @@ ZMK Studio support is enabled by default via the build configuration in [`build.
 
 ```yaml
 - board: seeeduino_xiao_ble
-  shield: prospector_dongle prospector_adapter
+  shield: dongle_prospector prospector_adapter
   snippet: studio-rpc-usb-uart
   cmake-args: -DCONFIG_ZMK_STUDIO=y
 ```
@@ -413,8 +434,8 @@ Push changes to your repository and GitHub Actions will automatically build firm
 
 - `charybdis_left-nice_nano_v2-zmk.uf2`
 - `charybdis_right_standalone-nice_nano_v2-zmk.uf2`
-- `charybdis_right_dongle-nice_nano_v2-zmk.uf2`
-- `prospector_dongle prospector_adapter-seeeduino_xiao_ble-zmk.uf2`
+- `dongle_charybdis_right-nice_nano_v2-zmk.uf2`
+- `dongle_prospector prospector_adapter-seeeduino_xiao_ble-zmk.uf2`
 - `tester_pro_micro-nice_nano_v2-zmk.uf2`
 - `settings_reset-nice_nano_v2-zmk.uf2`
 - `settings_reset-seeeduino_xiao_ble-zmk.uf2`
@@ -427,12 +448,12 @@ The interactive build script provides options for:
 
 1. **charybdis_left** - Left keyboard (works with both modes)
 2. **charybdis_right_standalone** - Right keyboard for standalone mode (Nice!Nano v2)
-3. **charybdis_right_dongle** - Right keyboard for dongle mode (Nice!Nano v2)
-4. **prospector_dongle prospector_adapter** - Dongle with display (Seeeduino XIAO BLE)
+3. **dongle_charybdis_right** - Right keyboard for dongle mode (Nice!Nano v2)
+4. **dongle_prospector prospector_adapter** - Dongle with display (Seeeduino XIAO BLE)
 5. **tester_pro_micro** - GPIO pin tester for Pro Micro-compatible boards
 6. **settings_reset** - Reset stored settings
 
-⚠️ **Known Issue:** Option 4 (prospector_dongle with prospector_adapter) currently fails in local builds due to module patching requirements. Options 1-3, 5, and 6 work correctly. **Use GitHub Actions for dongle builds** or consider using [act](https://github.com/nektos/act) to run the GitHub Actions workflow locally.
+⚠️ **Known Issue:** Option 4 (dongle_prospector with prospector_adapter) currently fails in local builds due to module patching requirements. Options 1-3, 5, and 6 work correctly. **Use GitHub Actions for dongle builds** or consider using [act](https://github.com/nektos/act) to run the GitHub Actions workflow locally.
 
 Built firmware files are automatically copied to `manual_build/artifacts/output/` with descriptive names.
 
@@ -463,15 +484,20 @@ Built firmware files are automatically copied to `manual_build/artifacts/output/
    a) **Prospector Dongle (Seeeduino XIAO BLE)**:
       - Flash `settings_reset-nice_nano_v2-zmk.uf2` to **both** keyboards
       - Flash `settings_reset-seeeduino_xiao_ble-zmk.uf2` to the **dongle**
-      - Flash `prospector_dongle prospector_adapter-seeeduino_xiao_ble-zmk.uf2` to the dongle
+      - Flash `dongle_prospector prospector_adapter-seeeduino_xiao_ble-zmk.uf2` to the dongle
 
-   b) **Nice!Nano Dongle (Nice!Nano v2)**
+   b) **YADS Prospector Dongle (Seeeduino XIAO BLE)**:
+      - Flash `settings_reset-nice_nano_v2-zmk.uf2` to **both** keyboards
+      - Flash `settings_reset-seeeduino_xiao_ble-zmk.uf2` to the **dongle**
+      - Flash `dongle_bwshockley_prospector dongle_screen-seeeduino_xiao_ble-zmk.uf2` to the dongle
+
+   c) **Nice!Nano Dongle (Nice!Nano v2)**
       - Flash `settings_reset-nice_nano_v2-zmk.uf2` to **all three** devices (left, right, dongle)
-      - Flash `nice_dongle dongle_display-nice_nano_v2-zmk.uf2` to the dongle
+      - Flash `dongle_nice dongle_display-nice_nano_v2-zmk.uf2` to the dongle
       - Connect OLED display to dongle via I2C (SDA→Pin 2, SCL→Pin 3)
 
 2. Flash `charybdis_left-nice_nano_v2-zmk.uf2` to the left keyboard
-3. Flash `charybdis_right_dongle-nice_nano_v2-zmk.uf2` to the right keyboard
+3. Flash `dongle_charybdis_right-nice_nano_v2-zmk.uf2` to the right keyboard
 4. **Important**: Pair the left keyboard to the dongle first, then pair the right keyboard
 
 ### Tester Pro Micro (GPIO Testing)
