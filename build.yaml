@@ -1,6 +1,6 @@
 ---
 include:
-# Left keyboard - same for all modes (always peripheral)
+# Left keyboard - same for all modes (always peripheral) пердеж
 - board: nice_nano
   shield: charybdis_left
 
