@@ -1,0 +1,17 @@
+&zmk_split_role { role = "central"; };
+
+&usb {
+    status = "okay";
+};
+
+&usb_hid {
+    status = "okay";
+};
+
+&ble {
+    status = "okay";
+};
+
+&zmk_hid {
+    status = "okay";
+};

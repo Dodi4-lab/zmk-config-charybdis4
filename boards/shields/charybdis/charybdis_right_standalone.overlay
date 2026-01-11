@@ -8,6 +8,7 @@
 
 #include "charybdis_right_common.dtsi"
 #include "charybdis_trackball_processors.dtsi"
+#include "charybdis_right_standalone.dtsi"
 
 / {
     trackball_listener: trackball_listener {
